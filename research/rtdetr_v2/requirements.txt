@@ -1,0 +1,37 @@
+# RT-DETR Fine-Tuning Dependencies
+# For GPU training on RunPod or local CUDA machines
+
+# Core ML Framework
+# Note: For CUDA, install torch with CUDA support first:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+torch>=2.0.0
+torchvision>=0.15.0
+
+# HuggingFace Transformers (RT-DETR model)
+transformers>=4.50.0
+
+# Training acceleration
+accelerate>=0.25.0
+
+# Metrics
+torchmetrics>=1.0.0
+pycocotools>=2.0.0
+
+# Data augmentation
+albumentations>=1.3.0
+
+# Image processing
+Pillow>=10.0.0
+opencv-python>=4.8.0
+
+# Config and utilities
+PyYAML>=6.0
+tqdm>=4.65.0
+numpy>=1.24.0
+
+# Optional: Weights & Biases logging
+# wandb>=0.15.0
+
+# Optional: Jupyter notebook support for debugging
+# jupyter>=1.0.0
+# matplotlib>=3.7.0

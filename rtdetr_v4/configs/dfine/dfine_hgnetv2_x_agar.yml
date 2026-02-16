@@ -1,0 +1,94 @@
+# D-FINE HGNetv2-X for AGAR Colony Detection (without DINOv3 distillation)
+# Single-class colony detection (all species merged into 1 class)
+# Use this for simpler training without teacher model setup
+
+__include__: [
+  '../dataset/agar_detection.yml',
+  '../runtime.yml',
+  '../base/dataloader.yml',
+  '../base/optimizer.yml',
+  '../base/dfine_hgnetv2.yml',
+]
+
+output_dir: ./outputs/dfine_hgnetv2_x_agar_1cls
+
+# Resolution: 1024x1024 to match YOLOv8 baseline
+eval_spatial_size: [1024, 1024]
+
+# Enable mixed precision (saves ~40% VRAM at 1024px)
+use_amp: True
+
+# Enable EMA for smoother convergence
+use_ema: True
+
+# Save checkpoints every 5 epochs (50-epoch run = 10 checkpoints)
+checkpoint_freq: 5
+
+RTv4:
+  backbone: HGNetv2
+
+HGNetv2:
+  name: 'B5'
+  return_idx: [1, 2, 3]
+  freeze_stem_only: True
+  freeze_at: 0
+  freeze_norm: True
+
+HybridEncoder:
+  hidden_dim: 384
+  dim_feedforward: 2048
+
+DFINETransformer:
+  feat_channels: [384, 384, 384]
+  num_classes: 1
+  reg_scale: 8
+
+RTv4Criterion:
+  num_classes: 1
+
+optimizer:
+  type: AdamW
+  params:
+    -
+      params: '^(?=.*backbone)(?!.*norm|bn).*$'
+      lr: 0.000015
+    -
+      params: '^(?=.*(?:encoder|decoder))(?=.*(?:norm|bn)).*$'
+      weight_decay: 0.
+
+  lr: 0.0006
+  betas: [0.9, 0.999]
+  weight_decay: 0.0001
+
+# Fine-tuning schedule (shorter than training from scratch)
+epoches: 42
+
+train_dataloader:
+  total_batch_size: 16  # 4 per GPU on 4x A100 80GB with AMP at 1024px
+  dataset:
+    transforms:
+      ops:
+        - {type: RandomPhotometricDistort, p: 0.5}
+        - {type: RandomZoomOut, fill: 0}
+        - {type: RandomIoUCrop, p: 0.8}
+        - {type: SanitizeBoundingBoxes, min_size: 1}
+        - {type: RandomHorizontalFlip}
+        - {type: Resize, size: [1024, 1024]}
+        - {type: SanitizeBoundingBoxes, min_size: 1}
+        - {type: ConvertPILImage, dtype: 'float32', scale: True}
+        - {type: ConvertBoxes, fmt: 'cxcywh', normalize: True}
+      policy:
+        epoch: 34
+  collate_fn:
+    base_size: 1024
+    stop_epoch: 34
+    ema_restart_decay: 0.9998
+    base_size_repeat: 3
+
+val_dataloader:
+  total_batch_size: 8  # 2 per GPU on 4x A100 for validation
+  dataset:
+    transforms:
+      ops:
+        - {type: Resize, size: [1024, 1024]}
+        - {type: ConvertPILImage, dtype: 'float32', scale: True}
