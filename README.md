@@ -131,3 +131,22 @@ The mobile app allows for field counting using a smartphone camera.
 ---
 
 _Note: Large model weights (.pt, .pb) are excluded from this repository. Users should train their own models or download pre-trained weights separately._
+
+## Citation
+
+If you use the AGAR dataset or this platform in your research, please cite the original AGAR paper:
+
+```bibtex
+@misc{majchrowska2021agar,
+  title={AGAR a microbial colony dataset for deep learning detection},
+  author={Sylwia Majchrowska and Jaros{\l}aw Paw{\l}owski and Grzegorz Gu{\l}a and Tomasz Bonus and Agata Hanas and Adam Loch and Agnieszka Pawlak and Justyna Roszkowiak and Tomasz Golan and Zuzanna Drulis-Kawa},
+  year={2021},
+  eprint={2108.01234},
+  archivePrefix={arXiv},
+  primaryClass={cs.CV}
+}
+```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
