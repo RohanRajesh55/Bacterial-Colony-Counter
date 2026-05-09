@@ -1,0 +1,21 @@
+# ===================================================================
+# YOLOv8 Inference Configuration (Web Application)
+# ===================================================================
+# This file contains class names for inference.
+# Dataset paths are only needed for training/validation.
+
+# Class configuration
+nc: 7
+names:
+  - "B.subtilis"
+  - "C.albicans"
+  - "Contamination"
+  - "Defect"
+  - "E.coli"
+  - "P.aeruginosa"
+  - "S.aureus"
+
+# Inference settings
+imgsz: 1024
+conf: 0.40
+iou: 0.5

@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: colony-counter-api
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount model weights from web/models to /app/models
+      - ./models:/app/models:ro
+    environment:
+      - DEVICE=cpu
+      - CNN_MODEL_PATH=models/cnn/final_best.pth
+      - YOLO_MODEL_PATH=models/yolo/best.pt
+      - YOLO_CONF_THRESHOLD=0.40
+      - YOLO_IMG_SIZE=1024
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+
+  frontend:
+    build: ./frontend
+    container_name: colony-counter-web
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  default:
+    name: colony-counter-network

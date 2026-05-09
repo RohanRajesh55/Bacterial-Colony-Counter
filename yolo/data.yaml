@@ -1,0 +1,76 @@
+# ===================================================================
+# YOLOv8 Training Configuration File
+# Updated for local Windows development
+# ===================================================================
+
+# -------------------
+# DATASET & CLASS SETTINGS
+# -------------------
+# Update these paths to point to your dataset location
+path: C:/Bacterial colony counter/yolo/dataset
+train: images/train
+val: images/val
+
+# Class configuration
+nc: 7
+names:
+  - "B.subtilis"
+  - "C.albicans"
+  - "Contamination"
+  - "Defect"
+  - "E.coli"
+  - "P.aeruginosa"
+  - "S.aureus"
+
+# -------------------
+# MODEL & TRAINING SETTINGS
+# -------------------
+project: "runs/colony_yolo"
+name: "yolov8m_antioverfitting"
+
+model: "yolov8m.pt"
+epochs: 100
+patience: 20                  # Early stopping patience
+imgsz: 1024
+batch: 16
+device: "0"                   # Use first GPU (or "cpu")
+workers: 8
+resume: false
+
+# --- Performance ---
+cache: true
+amp: true
+
+# -------------------
+# OPTIMIZER & REGULARIZATION
+# -------------------
+optimizer: "AdamW"
+lr0: 0.001
+lrf: 0.01
+cos_lr: true
+weight_decay: 0.0005          # L2 regularization
+warmup_epochs: 3
+
+# Anti-overfitting
+dropout: 0.1                  # Dropout in detection heads
+label_smoothing: 0.05         # Softens class targets
+
+# -------------------
+# AUGMENTATION SETTINGS (Strong for Generalization)
+# -------------------
+hsv_h: 0.015
+hsv_s: 0.5
+hsv_v: 0.4
+degrees: 15.0
+translate: 0.1
+scale: 0.4
+shear: 2.0
+flipud: 0.5
+fliplr: 0.5
+mosaic: 1.0
+mixup: 0.15
+copy_paste: 0.1
+close_mosaic: 10              # Disable mosaic last 10 epochs
+
+
+

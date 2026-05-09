@@ -1,0 +1,43 @@
+# Raspberry Pi Docker Compose Configuration
+# Uses ARM64-compatible images and CPU-only inference
+
+version: '3.8'
+
+services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: colony-counter-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models:ro
+    environment:
+      - DEVICE=cpu
+      - CNN_MODEL_PATH=models/cnn/final_best.pth
+      - YOLO_MODEL_PATH=models/yolo/best.pt
+      - YOLO_CONF_THRESHOLD=0.40
+      - YOLO_IMG_SIZE=640  # Reduced for Pi performance
+    deploy:
+      resources:
+        limits:
+          memory: 2G  # Limit memory for Pi 4
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: colony-counter-web
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    restart: unless-stopped
+
+networks:
+  default:
+    name: colony-counter-network
